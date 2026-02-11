@@ -59,10 +59,10 @@ index bfacb856623b5cb6af4f1b65ee89200cdfb1ef13..afeb2b0bc30264273a67cc308eee52c9
  
      public static LiteralCommandNode<CommandSourceStack> create() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index f83067eaa4eedc8108460c254782ba45a2933372..2a75d0db49b448533c90c14e5cff651e54a12dbb 100644
+index cfa4c67e80a50c9556f66529910c2783d3350b54..0d17e765f0f94e3b29c9bfc216cb0941c74ff5f9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -481,7 +481,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -487,7 +487,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
@@ -71,16 +71,3 @@ index f83067eaa4eedc8108460c254782ba45a2933372..2a75d0db49b448533c90c14e5cff651e
      }
  
      @Override
-diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 774556a62eb240da42e84db4502e2ed43495be17..80553face9c70c2a3d897681e7761df85b22d464 100644
---- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-+++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-@@ -11,7 +11,7 @@ public final class Versioning {
-     public static String getBukkitVersion() {
-         String result = "Unknown-Version";
- 
--        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.papermc.paper/paper-api/pom.properties");
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/gg.pufferfish.pufferfish/pufferfish-api/pom.properties"); // Pufferfish
-         Properties properties = new Properties();
- 
-         if (stream != null) {
