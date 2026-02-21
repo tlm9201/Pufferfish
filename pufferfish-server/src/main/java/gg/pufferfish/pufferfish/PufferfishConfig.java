@@ -159,6 +159,11 @@ public class PufferfishConfig {
 
 		setComment("projectile", "Optimizes projectile settings");
 	}
+
+    public static boolean enableWaypoints;
+    private static void waypoints() {
+        enableWaypoints = getBoolean("enable-waypoints", false, "Whether or not vanilla locator bar waypoints should be enabled");
+    }
 	
 	private static void setComment(String key, String... comment) {
 		if (config.contains(key)) {

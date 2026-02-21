@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: tlm9201 <timo@timomcgrath.com>
+Date: Sat, 21 Feb 2026 13:57:41 -0500
+Subject: [PATCH] Add option to disable waypoints
+
+Using the locator bar gamerule is *NOT* sufficient.
+Minecraft still does some logic even when the gamerule is set.
+
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index 05e9887b2b06a806d61cd572d26512d65473a3e0..b21b95499e7b6f60bc97ea808de9c56c5e350d24 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -2905,7 +2905,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         } else if (rule == GameRules.LOCATOR_BAR) {
+             // this.getAllLevels().forEach(serverLevel -> { // Paper - per-world game rules
+                 ServerWaypointManager waypointManager = serverLevel.getWaypointManager();
+-                if ((Boolean)value) {
++                if (gg.pufferfish.pufferfish.PufferfishConfig.enableWaypoints && (Boolean)value) { // Pufferfish - add option to disable waypoints
+                     serverLevel.players().forEach(waypointManager::updatePlayer);
+                 } else {
+                     waypointManager.breakAllConnections();
+diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
+index f6fa4563bd63eb53667a9de07469fec098cfa51d..b570c752a9ad1c8e03620812adde900e5e7f410f 100644
+--- a/net/minecraft/server/level/ServerChunkCache.java
++++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -752,7 +752,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+     public void move(ServerPlayer player) {
+         if (!player.isRemoved()) {
+             this.chunkMap.move(player);
+-            if (player.isReceivingWaypoints()) {
++            if (gg.pufferfish.pufferfish.PufferfishConfig.enableWaypoints && player.isReceivingWaypoints()) {  // Pufferfish - add option to disable waypoints
+                 this.level.getWaypointManager().updatePlayer(player);
+             }
+         }
+diff --git a/net/minecraft/server/waypoints/ServerWaypointManager.java b/net/minecraft/server/waypoints/ServerWaypointManager.java
+index 471e558a609c9e457720660b90fe57322b860461..bbecfbd4860faffda452e9aadecb9cbacfe02256 100644
+--- a/net/minecraft/server/waypoints/ServerWaypointManager.java
++++ b/net/minecraft/server/waypoints/ServerWaypointManager.java
+@@ -102,7 +102,7 @@ public class ServerWaypointManager implements WaypointManager<WaypointTransmitte
+     }
+ 
+     private static boolean isLocatorBarEnabledFor(ServerPlayer player) {
+-        return player.level().getGameRules().get(GameRules.LOCATOR_BAR);
++        return gg.pufferfish.pufferfish.PufferfishConfig.enableWaypoints && player.level().getGameRules().get(GameRules.LOCATOR_BAR); // Pufferfish - add option to disable waypoints
+     }
+ 
+     private void createConnection(ServerPlayer player, WaypointTransmitter waypoint) {
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 23ed79f4bfb5a45375c04329a04cd8ae0c0ea068..739c668bc2d2ccdd2ae45820950c0c2fdef8034f 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -5050,7 +5050,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+             }
+ 
+             this.levelCallback.onMove();
+-            if (!this.firstTick && this.level instanceof ServerLevel serverLevel && !this.isRemoved()) {
++            if (gg.pufferfish.pufferfish.PufferfishConfig.enableWaypoints && !this.firstTick && this.level instanceof ServerLevel serverLevel && !this.isRemoved()) { // Pufferfish - add option to disable waypoints
+                 if (this instanceof WaypointTransmitter waypointTransmitter && waypointTransmitter.isTransmittingWaypoint()) {
+                     serverLevel.getWaypointManager().updateWaypoint(waypointTransmitter);
+                 }
