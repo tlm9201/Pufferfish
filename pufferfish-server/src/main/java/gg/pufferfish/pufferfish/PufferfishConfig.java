@@ -164,6 +164,13 @@ public class PufferfishConfig {
     private static void waypoints() {
         enableWaypoints = getBoolean("enable-waypoints", false, "Whether or not vanilla locator bar waypoints should be enabled");
     }
+
+    public static int maxTrackersPerEntity;
+    public static int trackerUpdateInterval;
+    private static void tracker() {
+        maxTrackersPerEntity = getInt("tracker.max-per-entity", 50, "Limits the number of players that can track an entity");
+        trackerUpdateInterval = getInt("tracker.update-interval", 1, "How often (in ticks) that we will do a full update for an entity");
+    }
 	
 	private static void setComment(String key, String... comment) {
 		if (config.contains(key)) {

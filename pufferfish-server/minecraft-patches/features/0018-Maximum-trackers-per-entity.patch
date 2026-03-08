@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PureGero <puregero@gmail.com>
+Date: Fri, 18 Jul 2025 14:24:19 +0900
+Subject: [PATCH] Maximum trackers per entity
+
+Original patch: https://github.com/MultiPaper/ShreddedPaper/blob/ver/1.20.6/patches/server/0064-Optimization-maximum-trackers-per-entity.patch 
+Original license: GPLv3
+
+diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
+index ab8893163ac85971a470e4a4d6fa76bd174e2bae..3e0b833b0ebd2a287106ac7fa9b8c7b18e6b6b9d 100644
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -1232,6 +1232,9 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+                 return;
+             }
+ 
++            boolean fullTrackerUpdate = (level.getGameTime() ^ (long) this.entity.getId()) % gg.pufferfish.pufferfish.PufferfishConfig.trackerUpdateInterval == 0L; // Pufferfish
++            int limit = gg.pufferfish.pufferfish.PufferfishConfig.maxTrackersPerEntity > 0 ? gg.pufferfish.pufferfish.PufferfishConfig.maxTrackersPerEntity : -1; // Pufferfish
++            int len = limit > 0 ? Math.min(players.size(), limit) : players.size(); // Pufferfish
+             final long lastChunkUpdate = this.lastChunkUpdate;
+             final long currChunkUpdate = chunk.getUpdateCount();
+             final ca.spottedleaf.moonrise.common.misc.NearbyPlayers.TrackedChunk lastTrackedChunk = this.lastTrackedChunk;
+@@ -1239,12 +1242,23 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+             this.lastTrackedChunk = chunk;
+ 
+             final ServerPlayer[] playersRaw = players.getRawDataUnchecked();
++            boolean useMaxTrackers = limit > 0 && limit < players.size(); // Pufferfish - max trackers per entity
++            if (useMaxTrackers) gg.pufferfish.pufferfish.tracker.TrackerUtil.sortPlayersLimited(entity.position(), playersRaw, len); // Pufferfish - max trackers per entity
+ 
+-            for (int i = 0, len = players.size(); i < len; ++i) {
++            for (int i = 0; i < len; ++i) { // Pufferfish - max trackers per entity
+                 final ServerPlayer player = playersRaw[i];
+-                this.updatePlayer(player);
++                if (fullTrackerUpdate || !this.seenBy.contains(player.connection)) this.updatePlayer(player); // Pufferfish - full tracker update interval
+             }
+ 
++            // Pufferfish start - max trackers per entity
++            if (useMaxTrackers) {
++                for (int i = len; i < players.size(); ++i) {
++                    final ServerPlayer player = playersRaw[i];
++                    if (this.seenBy.contains(player.connection)) this.removePlayer(player);
++                }
++            }
++            // Pufferfish end
++
+             if (lastChunkUpdate != currChunkUpdate || lastTrackedChunk != chunk) {
+                 // need to purge any players possible not in the chunk list
+                 for (final ServerPlayerConnection conn : new java.util.ArrayList<>(this.seenBy)) {
