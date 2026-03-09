@@ -42,7 +42,7 @@
  tasks.jar {
      from(generateApiVersioningFile.flatMap { it.outputFile })
      manifest {
-@@ -216,11 +_,11 @@
+@@ -217,11 +_,11 @@
      }
  
      // workaround for https://github.com/gradle/gradle/issues/4046
@@ -56,7 +56,7 @@
                  include("**/doc-files/**")
              }
              into("build/docs/javadoc")
-@@ -235,6 +_,7 @@
+@@ -236,6 +_,7 @@
      val provider = objects.newInstance<MockitoAgentProvider>()
      provider.fileCollection.from(mockitoAgent)
      jvmArgumentProviders.add(provider)
